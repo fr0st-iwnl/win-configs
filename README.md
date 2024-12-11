@@ -1,9 +1,6 @@
 # ⚙️ \\\ WinConfigs
 A simple tool to manage Windows utilities, system info, repositories, and performance tweaks.
 
-> [!NOTE]
-> This script was made for my personal use and is not fully updated. It's still a work in progress.
-
 ## 📦 Installation 
 
 ### 1. Download the repository
@@ -27,7 +24,7 @@ git clone https://github.com/fr0st-iwnl/WinConfigs.git
 
 ## 📝 TODO's
 
-- [ ] Create categories for **System Monitor**, **System Info**, and others.
-- [ ] Enhance UI with colors for a better user experience.
-- [ ] Make paths for ASCII folder; if the user doesn't extract it, it should not appear.
-- [ ] Add more improvements and features.
+- [x] Create categories for **System Monitor**, **System Info**, and others.
+- [x] Enhance UI with colors for a better user experience.
+- [x] Make paths for ASCII folder; if the user doesn't extract it, it should not appear.
+- [x] Add more improvements and features.
