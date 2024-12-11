@@ -4,7 +4,7 @@ A simple batch script to manage Windows utilities, system info, repositories, an
 ## 📦 Installation 
 
 ### 1. Download the repository
-- Clone this repository or download the ZIP.
+- Clone this repository or download the ZIP. **If you downloaded the ZIP, make sure to extract it before running the script.**
 ```
 git clone https://github.com/fr0st-iwnl/WinConfigs.git
 ```
