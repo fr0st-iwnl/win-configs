@@ -28,4 +28,4 @@ git clone https://github.com/fr0st-iwnl/WinConfigs.git
 - [x] Enhance UI with colors for a better user experience.
 - [x] Make paths for ASCII folder; if the user doesn't extract it, it should not appear.
 - [x] Add more improvements and features.
-- [ ] Create a `CONTRIBUTING.md` file to guide users on how to contribute to the project.
+- [x] Create a `CONTRIBUTING.md` file to guide users on how to contribute to the project.
