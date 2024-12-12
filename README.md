@@ -30,3 +30,4 @@ git clone https://github.com/fr0st-iwnl/WinConfigs.git
 - [x] Add more improvements and features.
 - [x] Create a `CONTRIBUTING.md` file to guide users on how to contribute to the project.
 - [x] Update the script to install packages from a `.txt` file using **Scoop** for easier customization.
+- [ ] Update the script to install custom repositories from a `.txt` file or redesign the installation process for them.
