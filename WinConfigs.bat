@@ -51,7 +51,7 @@ set "COLOR_MAGENTA=%ESC%[35m"
 ::-------------------
 :: VERSION
 ::-------------------
-set "LOCAL_VERSION=1.0"
+set "LOCAL_VERSION=1.1"
 
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content"') do set "LATEST_VERSION=%%i"
 
@@ -159,7 +159,7 @@ if /i "%winutil_confirm%"=="y" (
     powershell -Command "Start-Process powershell -ArgumentList 'irm \"https://christitus.com/win\" | iex' -Verb runAs"
     echo %COLOR_GREEN%WinUtil has been installed.%COLOR_RESET%
 ) else (
-    echo Installation canceled.
+    echo %COLOR_RED%Installation canceled.%COLOR_RESET%
 )
 pause
 goto main_menu
@@ -177,17 +177,23 @@ echo %COLOR_BLUE%      PACKAGE MANAGER MENU%COLOR_RESET%
 echo %COLOR_MAGENTA%************************************%COLOR_RESET%
 echo.
 echo %COLOR_GREEN%[1] Install Scoop%COLOR_RESET%
-echo %COLOR_GREEN%[2] Install Packages%COLOR_RESET%
-echo %COLOR_GREEN%[3] Update Scoop%COLOR_RESET%
-echo %COLOR_GREEN%[4] Uninstall Scoop%COLOR_RESET%
+echo %COLOR_GREEN%[2] Update Scoop%COLOR_RESET%
+echo %COLOR_GREEN%[3] Uninstall Scoop%COLOR_RESET%
+echo.
+echo %COLOR_CYAN%************* Packages *************%COLOR_RESET%
+echo.
+echo %COLOR_GREEN%[4] Install Packages%COLOR_RESET%
+echo %COLOR_GREEN%[5] Uninstall Packages%COLOR_RESET%
+echo.
 echo %COLOR_LIGHT_RED%[0] Back to Main Menu%COLOR_RESET%
 echo.
 set /p pm_choice="< "
 
 if "%pm_choice%"=="1" goto install_scoop
-if "%pm_choice%"=="2" goto install_packages
-if "%pm_choice%"=="3" goto update_scoop
-if "%pm_choice%"=="4" goto uninstall_scoop
+if "%pm_choice%"=="2" goto update_scoop
+if "%pm_choice%"=="3" goto uninstall_scoop
+if "%pm_choice%"=="4" goto install_packages
+if "%pm_choice%"=="5" goto uninstall_packages
 if "%pm_choice%"=="0" goto main_menu
 echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
 pause
@@ -208,21 +214,114 @@ pause
 goto package_manager
 
 
-::-------------------
+::----------------------
 :: INSTALL PACKAGES
-::-------------------
+::----------------------
 :install_packages
+cls
+type ASCII\ascii.txt
+echo.
+echo Checking packages to install from 'Configuration\scoop-packages\packages-list.txt'
+
+if not exist "Configuration\scoop-packages\packages-list.txt" (
+    echo %COLOR_RED%Error: The file 'packages-list.txt' was not found in 'Configuration\scoop-packages'.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+
+echo The following packages will be installed:
+echo.
+for /f "usebackq delims=" %%p in ("Configuration\scoop-packages\packages-list.txt") do (
+    echo %COLOR_YELLOW%[+] %%p%COLOR_RESET%
+)
+echo.
+
+set /p confirm_install=Do you want to proceed with the installation? %COLOR_YELLOW%Y/N%COLOR_RESET% 
+if /i not "%confirm_install%"=="y" (
+    echo %COLOR_RED%Installation canceled.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+
 cls
 type ASCII\ascii.txt
 echo.
 echo Installing Packages via Scoop...
 echo %COLOR_WHITE%Please wait while we install the essentials...%COLOR_RESET%
+
+
+echo Checking if Git is installed...
+powershell -Command "if (-not (Get-Command git -ErrorAction SilentlyContinue)) { exit 1 }"
+
+if errorlevel 1 (
+    echo %COLOR_RED%Git is not installed. Installing Git...%COLOR_RESET%
+    powershell -Command "scoop install git"
+    echo %COLOR_GREEN%Git installed successfully!%COLOR_RESET%
+)
+
+
 powershell -Command "scoop bucket add extras"
-powershell -Command "scoop install git"
-powershell -Command "scoop install nodejs"
+
+
+for /f "usebackq delims=" %%p in ("Configuration\scoop-packages\packages-list.txt") do (
+    echo Installing package: %%p
+    powershell -Command "scoop install %%p"
+)
+
 echo %COLOR_GREEN%Packages installed successfully!%COLOR_RESET%
 pause
 goto package_manager
+
+
+::----------------------
+:: UNINSTALL PACKAGES
+::----------------------
+:uninstall_packages
+cls
+type ASCII\ascii.txt
+echo.
+echo %COLOR_MAGENTA%**************************************%COLOR_RESET%
+echo %COLOR_RED%          WARNING!%COLOR_RESET%
+echo %COLOR_YELLOW%    THIS WILL UNINSTALL THE PACKAGES%COLOR_RESET%
+echo %COLOR_MAGENTA%**************************************%COLOR_RESET%
+echo.
+echo Checking packages to uninstall from 'Configuration\scoop-packages\packages-list.txt'
+
+if not exist "Configuration\scoop-packages\packages-list.txt" (
+    echo %COLOR_RED%Error: The file 'packages-list.txt' was not found in 'Configuration\scoop-packages'.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+
+echo The following packages will be uninstalled:
+echo.
+for /f "usebackq delims=" %%p in ("Configuration\scoop-packages\packages-list.txt") do (
+    echo %COLOR_YELLOW%[-] %%p%COLOR_RESET%
+)
+echo.
+
+set /p confirm_uninstall=Do you want to proceed with the uninstallation? %COLOR_YELLOW%Y/N%COLOR_RESET% 
+if /i not "%confirm_uninstall%"=="y" (
+    echo %COLOR_RED%Uninstallation canceled.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+
+cls
+type ASCII\ascii.txt
+echo.
+echo Uninstalling Packages via Scoop...
+echo %COLOR_WHITE%Please wait while we uninstall the packages...%COLOR_RESET%
+
+for /f "usebackq delims=" %%p in ("Configuration\scoop-packages\packages-list.txt") do (
+    echo Uninstalling package: %%p
+    powershell -Command "scoop uninstall %%p"
+)
+
+echo %COLOR_GREEN%Packages uninstalled successfully!%COLOR_RESET%
+pause
+goto package_manager
+
 
 
 ::-------------------
