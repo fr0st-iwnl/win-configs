@@ -46,37 +46,72 @@ set "COLOR_BLUE=%ESC%[38;2;59;120;255m"
 set "COLOR_CYAN=%ESC%[36m"
 set "COLOR_LIGHT_YELLOW=%ESC%[38;5;230m"
 set "COLOR_WHITE=%ESC%[97m"
-set "COLOR_MAGENTA=%ESC%[35m"
 
 ::-------------------
-:: VERSION
+:: VERSION CHECK
 ::-------------------
 set "LOCAL_VERSION=1.2"
 
-for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content"') do set "LATEST_VERSION=%%i"
+:: Fetch the latest version from Pastebin
+for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
 
+:: Compare versions
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
     goto main_menu
 ) else (
-    echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%. 
+    echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%.
     echo Your current version is: %COLOR_YELLOW%%LOCAL_VERSION%%COLOR_RESET%.
     echo %COLOR_DARK_RED%Please update the script to the latest version.%COLOR_RESET%
     echo.
     :ask_update
-    echo Do you want to download and install the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
+    echo Do you want to download and update to the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
     set /p install_update="< "
 )
     if /i "%install_update%"=="y" (
-        :: Download and Install the latest version
+        :: Notify the user
         echo Downloading the latest version from GitHub...
-        powershell -Command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/master/WinConfigs.bat -OutFile WinConfigs.bat"
-        echo Latest version has been downloaded and installed.
-        echo Restarting the script...
-        timeout /t 2 >nul
-        call WinConfigs.bat
+        
+        powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip -OutFile WinConfigs.zip"
+        
+        if exist WinConfigs.zip (
+            echo ZIP file downloaded successfully.
+            
+            powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
+            
+            echo.
+            echo Files after extraction:
+            dir /b /s WinConfigs-master
+            echo.
+            
+            echo Removing old files...
+            if exist ASCII rmdir /s /q ASCII
+            if exist Assets rmdir /s /q Assets
+            if exist Configuration rmdir /s /q Configuration
+
+            echo Moving new files...
+            powershell -Command "Move-Item -Path '.\WinConfigs-master\*' -Destination . -Force"
+            
+            del WinConfigs.zip
+            rmdir /s /q WinConfigs-master
+            
+            echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%.
+            echo Restarting the script...
+            timeout /t 2 >nul
+
+            start "" "%~dp0WinConfigs.bat"
+            exit
+        ) else (
+            echo %COLOR_RED%Failed to download the ZIP file. Please check your network connection.%COLOR_RESET%
+            pause
+            goto main_menu
+        )
     ) else if /i "%install_update%"=="n" (
-    goto main_menu
-)
+        echo Update canceled. Returning to the main menu...
+        pause
+        goto main_menu
+    )
+
+
 
 
 ::-------------------
@@ -211,9 +246,20 @@ echo.
 echo Installing Scoop...
 powershell -Command "Set-ExecutionPolicy RemoteSigned -scope CurrentUser"
 powershell -Command "irm get.scoop.sh | iex"
+if errorlevel 1 (
+    echo %COLOR_RED%Failed to install Scoop. Please check your internet connection.%COLOR_RESET%
+    pause
+    goto package_manager
+)
 echo %COLOR_GREEN%Scoop installed successfully!%COLOR_RESET%
-pause
-goto package_manager
+echo.
+echo %COLOR_YELLOW%RESTARTING SCRIPT TO MAKE THE SCOOP COMMAND WORK...%COLOR_RESET%
+echo.
+powershell -Command "[console]::beep(600, 300)"
+timeout /t 3 > nul
+start "" "%~f0"
+exit
+
 
 
 ::----------------------
@@ -345,7 +391,33 @@ goto package_manager
 cls
 type ASCII\ascii.txt
 echo.
+echo %COLOR_YELLOW%Before uninstalling Scoop, all installed Scoop apps must be uninstalled.%COLOR_RESET%
+echo %COLOR_CYAN%Would you like to uninstall all Scoop apps first? (Y/N)%COLOR_RESET%
+set /p confirm_uninstall_apps="< "
+
+if /i "%confirm_uninstall_apps%"=="y" (
+    echo %COLOR_YELLOW%Uninstalling all Scoop apps...%COLOR_RESET%
+    powershell -Command "scoop list | %{ scoop uninstall $_.Name }"
+    if errorlevel 1 (
+        echo %COLOR_RED%Failed to uninstall some Scoop apps. Please check manually.%COLOR_RESET%
+        pause
+        goto package_manager
+    )
+    echo %COLOR_GREEN%All Scoop apps have been uninstalled successfully!%COLOR_RESET%
+) else (
+    echo %COLOR_LIGHT_RED%Uninstallation canceled. Returning to Package Manager menu.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+
+echo %COLOR_YELLOW%Now uninstalling Scoop itself...%COLOR_RESET%
 powershell -Command "scoop uninstall scoop"
+if errorlevel 1 (
+    echo %COLOR_RED%Failed to uninstall Scoop. Please check manually.%COLOR_RESET%
+    pause
+    goto package_manager
+)
+echo %COLOR_GREEN%Scoop uninstalled successfully!%COLOR_RESET%
 pause
 goto package_manager
 
