@@ -46,16 +46,15 @@ set "COLOR_BLUE=%ESC%[38;2;59;120;255m"
 set "COLOR_CYAN=%ESC%[36m"
 set "COLOR_LIGHT_YELLOW=%ESC%[38;5;230m"
 set "COLOR_WHITE=%ESC%[97m"
+set "COLOR_MAGENTA=%ESC%[35m"
 
 ::-------------------
 :: VERSION CHECK
 ::-------------------
 set "LOCAL_VERSION=1.2"
 
-:: Fetch the latest version from Pastebin
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
 
-:: Compare versions
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
     goto main_menu
 ) else (
@@ -68,7 +67,6 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
     set /p install_update="< "
 )
     if /i "%install_update%"=="y" (
-        :: Notify the user
         echo Downloading the latest version from GitHub...
         
         powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip -OutFile WinConfigs.zip"
