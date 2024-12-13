@@ -55,3 +55,5 @@ Each repository will be listed with a prompt when you run the script, asking if 
 - [x] Create a `CONTRIBUTING.md` file to guide users on how to contribute to the project.
 - [x] Update the script to install packages from a `.txt` file using **Scoop** for easier customization.
 - [x] Update the script to install custom repositories from a `.txt` file or redesign the installation process for them.
+- [ ] Improve version handling in the script for better version tracking and updates.
+- [ ] Improve the script and fix minor bugs for smoother user experience.
