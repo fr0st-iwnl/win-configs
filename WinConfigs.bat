@@ -51,7 +51,7 @@ set "COLOR_MAGENTA=%ESC%[35m"
 ::-------------------
 :: VERSION CHECK
 ::-------------------
-set "LOCAL_VERSION=1.1"
+set "LOCAL_VERSION=1.2"
 
 :: Fetch the latest version from Pastebin
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
