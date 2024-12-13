@@ -1,5 +1,6 @@
 <div align="center">
   <h1>⚙️ \\ WinConfigs</h1>
+<br>
   <table>
     <tr>
       <td>
