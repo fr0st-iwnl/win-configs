@@ -74,7 +74,7 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
         :: Notify the user
         echo Downloading the latest version from GitHub...
         
-        :: Download the latest version's ZIP file from GitHub (dev branch)
+        :: Download the entire repository as a ZIP file from GitHub (dev branch)
         powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/dev.zip -OutFile WinConfigs.zip"
         
         :: Check if the file was downloaded
@@ -84,20 +84,27 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
             :: Extract the ZIP file
             powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
             
-            :: Remove existing files in the current directory (if any) before moving new ones
+            :: List the extracted files for debugging
+            echo.
+            echo Files after extraction:
+            dir /b /s WinConfigs-dev
+            echo.
+            
+            :: Remove old files (only remove if the directory exists)
             echo Removing old files...
-            rmdir /s /q ASCII
-            rmdir /s /q Assets
-            rmdir /s /q Configuration
-            rmdir /s /q Scripts
-            rmdir /s /q Version
+            if exist ASCII rmdir /s /q ASCII
+            if exist Assets rmdir /s /q Assets
+            if exist Configuration rmdir /s /q Configuration
+            if exist Scripts rmdir /s /q Scripts
+            if exist Version rmdir /s /q Version
 
             :: Move files from extracted folder to current folder (after extraction, the folder is named WinConfigs-dev)
+            echo Moving new files...
             powershell -Command "Move-Item -Path '.\WinConfigs-dev\*' -Destination . -Force"
             
-            :: Clean up by deleting the extracted folder and ZIP file
-            rmdir /s /q WinConfigs-dev
+            :: Clean up by deleting the ZIP file and the extracted folder
             del WinConfigs.zip
+            rmdir /s /q WinConfigs-dev
             
             :: Notify user and restart the script
             echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%.
