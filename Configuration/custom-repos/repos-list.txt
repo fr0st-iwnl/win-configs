@@ -1,0 +1,3 @@
+https://github.com/fr0st-iwnl/wallz#Wallz#Pictures#A collection of curated wallpapers.
+https://github.com/fr0st-iwnl/WinMacros#WinMacros#Documents#Macros for productivity on Windows.
+https://github.com/fr0st-iwnl/XPicker#XPicker#Documents#A slim and efficient color picker made in AutoHotkey.

@@ -51,7 +51,7 @@ set "COLOR_MAGENTA=%ESC%[35m"
 ::-------------------
 :: VERSION
 ::-------------------
-set "LOCAL_VERSION=1.1"
+set "LOCAL_VERSION=1.2"
 
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content"') do set "LATEST_VERSION=%%i"
 
@@ -94,6 +94,7 @@ echo %COLOR_GREEN%[1] Package Manager%COLOR_RESET%
 echo %COLOR_GREEN%[2] Custom Repositories%COLOR_RESET%
 echo %COLOR_CYAN%[3] System Utilities%COLOR_RESET%
 echo %COLOR_YELLOW%[4] WinUtil%COLOR_RESET%
+echo.
 echo %COLOR_LIGHT_RED%[0] Exit%COLOR_RESET%
 echo.
 set /p choice="< "
@@ -120,6 +121,7 @@ echo %COLOR_MAGENTA%************************************%COLOR_RESET%
 echo.
 echo %COLOR_GREEN%[1] System Info%COLOR_RESET%
 echo %COLOR_GREEN%[2] System Monitor%COLOR_RESET%
+echo.
 echo %COLOR_LIGHT_RED%[0] Back to Main Menu%COLOR_RESET%
 echo.
 set /p sys_util_choice="< "
@@ -139,9 +141,9 @@ goto system_utilities
 cls
 type ASCII\ascii.txt
 echo.
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
 echo %COLOR_CYAN%WinUtil: Enhance Your Windows Experience%COLOR_RESET%
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
 echo.
 echo %COLOR_WHITE%Github: https://github.com/ChrisTitusTech/winutil%COLOR_RESET%
 echo.
@@ -348,9 +350,9 @@ pause
 goto package_manager
 
 
-::-------------------
+::-----------------------
 :: CUSTOM REPOSITORIES
-::-------------------
+::-----------------------
 :custom_repositories
 cls
 type ASCII\ascii.txt
@@ -362,101 +364,125 @@ echo.
 echo %COLOR_LIGHT_CYAN%If you want to add a new repository, please create a pull request here:%COLOR_RESET%
 echo %COLOR_LIGHT_CYAN%https://github.com/fr0st-iwnl/WinConfigs/pulls%COLOR_RESET%
 echo.
-echo %COLOR_YELLOW%[1] \\ Wallz [https://github.com/fr0st-iwnl/wallz]%COLOR_RESET%
-echo %COLOR_YELLOW%[2] \\ WinMacros [https://github.com/fr0st-iwnl/WinMacros]%COLOR_RESET%
-echo %COLOR_YELLOW%[3] \\ XPicker [https://github.com/fr0st-iwnl/XPicker]%COLOR_RESET%
+
+setlocal enabledelayedexpansion
+set /a counter=0
+
+if not exist "Configuration\custom-repos\repos-list.txt" (
+    echo %COLOR_RED%Error: File 'repos-list.txt' not found at 'Configuration\custom-repos\'.%COLOR_RESET%
+    pause
+    goto main_menu
+)
+
+:: Read the repos-list.txt and display options
+for /f "tokens=1,2,3,4 delims=#" %%A in (Configuration\custom-repos\repos-list.txt) do (
+    set /a counter+=1
+    set "repo_url_!counter!=%%A"
+    set "repo_name_!counter!=%%B"
+    set "repo_dir_!counter!=%%C"
+    set "repo_desc_!counter!=%%D"
+
+    echo %COLOR_YELLOW%[!counter!] \\ %%B%COLOR_RESET%
+)
+
+echo.
 echo %COLOR_LIGHT_RED%[0] Back to Main Menu%COLOR_RESET%
 echo.
+
+
+if %counter%==0 (
+    echo %COLOR_RED%No repositories found in 'repos-list.txt'.%COLOR_RESET%
+    pause
+    goto main_menu
+)
+
+
 set /p repo_choice="< "
 
-if "%repo_choice%"=="1" goto install_wallz
-if "%repo_choice%"=="2" goto install_winmacros
-if "%repo_choice%"=="3" goto install_xpicker
 if "%repo_choice%"=="0" goto main_menu
-echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
-pause
-goto custom_repositories
+if %repo_choice% gtr %counter% (
+    echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
+    pause
+    goto custom_repositories
+)
 
+if %repo_choice% lss 1 (
+    echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
+    pause
+    goto custom_repositories
+)
 
-::-------------------
-:: INSTALL WALLZ
-::-------------------
-:install_wallz
+:: REPOSITORY DETAILS
+set "selected_url=!repo_url_%repo_choice%!"
+set "selected_name=!repo_name_%repo_choice%!"
+set "selected_dir=!repo_dir_%repo_choice%!"
+set "selected_desc=!repo_desc_%repo_choice%!"
+
+:: Display repository info and prompt for installation
 cls
 type ASCII\ascii.txt
 echo.
-echo %COLOR_CYAN%Wallz Repository%COLOR_RESET%
-echo This repository provides curated wallpapers with powerful download automation.
+echo %COLOR_CYAN%************************************%COLOR_RESET%
+echo %COLOR_GREEN%       !selected_name! Repository%COLOR_RESET%
+echo %COLOR_CYAN%************************************%COLOR_RESET%
+echo.
+echo %COLOR_LIGHT_YELLOW%@ Directory: %USERPROFILE%\%selected_dir%%COLOR_RESET%
+echo.
+echo %COLOR_LIGHT_CYAN%# !selected_desc!%COLOR_RESET%
+echo.
+echo %COLOR_YELLOW%Would you like to install it? %COLOR_GREEN%Y/N%COLOR_RESET%
+set /p confirm_install="< "
+if /i "%confirm_install%"=="y" (
+    call :install_repository "!selected_url!" "!selected_name!" "!selected_dir!" "!selected_desc!"
+) else (
+    echo %COLOR_RED%Installation canceled.%COLOR_RESET%
+    pause
+)
+goto custom_repositories
+
+::-----------------------
+:: INSTALL REPOSITORY
+::-----------------------
+:install_repository
+:: Parameters: %1=repo_url, %2=repo_name, %3=install_dir, %4=repo_desc
+cls
+type ASCII\ascii.txt
+echo.
+echo %COLOR_CYAN%************************************%COLOR_RESET%
+echo %COLOR_GREEN%Installing %~2 Repository%COLOR_RESET%
+echo %COLOR_CYAN%************************************%COLOR_RESET%
+echo.
+echo %COLOR_LIGHT_YELLOW%@ Target Directory: %USERPROFILE%\%~3%COLOR_RESET%
+echo.
+echo %COLOR_LIGHT_CYAN%# Description: %~4%COLOR_RESET%
+echo.
+echo %COLOR_YELLOW%Proceeding with installation...%COLOR_RESET%
+
 call :check_git_installed
 if errorlevel 1 (
     pause
     goto custom_repositories
 )
-echo Would you like to install it? %COLOR_YELLOW%Y/N%COLOR_RESET%
-set /p wallz_confirm="< "
-if /i "%wallz_confirm%"=="y" (
-    echo Installing Wallz repository...
-    powershell -Command "cd $env:USERPROFILE\Pictures; git clone https://github.com/fr0st-iwnl/wallz.git"
-    echo %COLOR_GREEN%Wallz repository has been installed to your Pictures folder.%COLOR_RESET%
-) else (
-    echo Installation canceled.
+
+set "install_dir=%USERPROFILE%\%~3"
+if not exist "%install_dir%" (
+    echo %COLOR_YELLOW%Target directory does not exist. Creating: %install_dir%%COLOR_RESET%
+    mkdir "%install_dir%"
 )
-pause
-goto custom_repositories
 
 
-::-------------------
-:: INSTALL WINMACROS
-::-------------------
-:install_winmacros
-cls
-type ASCII\ascii.txt
-echo.
-echo %COLOR_CYAN%WinMacros Repository%COLOR_RESET%
-echo This repository provides powerful macros to enhance productivity on Windows.
-call :check_git_installed
+echo %COLOR_LIGHT_CYAN%Cloning repository from %~1...%COLOR_RESET%
+powershell -Command "cd '%install_dir%' ; git clone %~1"
 if errorlevel 1 (
-    pause
-    goto custom_repositories
-)
-echo Would you like to install it? %COLOR_YELLOW%Y/N%COLOR_RESET%
-set /p winmacros_confirm="< "
-if /i "%winmacros_confirm%"=="y" (
-    echo Installing WinMacros repository...
-    powershell -Command "cd $env:USERPROFILE\Documents; git clone https://github.com/fr0st-iwnl/WinMacros.git"
-    echo %COLOR_GREEN%WinMacros repository has been installed to your Documents folder.%COLOR_RESET%
+    echo %COLOR_RED%Failed to clone the repository. The repository may already exist, there could be network issues, or the URL may be invalid.%COLOR_RESET%
 ) else (
-    echo Installation canceled.
+    echo %COLOR_GREEN%Repository '%~2' has been installed in %install_dir%!%COLOR_RESET%
 )
 pause
 goto custom_repositories
 
 
-::-------------------
-:: INSTALL XPICKER
-::-------------------
-:install_xpicker
-cls
-type ASCII\ascii.txt
-echo.
-echo %COLOR_CYAN%XPicker Repository%COLOR_RESET%
-echo This repository contains a Slim color picker made in AutoHotkey. 
-call :check_git_installed
-if errorlevel 1 (
-    pause
-    goto custom_repositories
-)
-echo Would you like to install it? %COLOR_YELLOW%Y/N%COLOR_RESET%
-set /p xpicker_confirm="< "
-if /i "%xpicker_confirm%"=="y" (
-    echo Installing XPicker repository...
-    powershell -Command "cd $env:USERPROFILE\Documents; git clone https://github.com/fr0st-iwnl/XPicker.git"
-    echo %COLOR_GREEN%XPicker repository has been installed to your Documents folder.%COLOR_RESET%
-) else (
-    echo Installation canceled.
-)
-pause
-goto custom_repositories
+
 
 
 ::-------------------
