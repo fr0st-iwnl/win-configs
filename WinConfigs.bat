@@ -49,52 +49,74 @@ set "COLOR_WHITE=%ESC%[97m"
 set "COLOR_MAGENTA=%ESC%[35m"
 
 ::-------------------
-:: VERSION
+:: VERSION CHECK
 ::-------------------
-set "LOCAL_VERSION_FILE=version.txt"
-set "LATEST_VERSION_FILE=https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/master/Version/version.txt"
-set "GITHUB_REPO=https://github.com/fr0st-iwnl/WinConfigs.git"
-set "LOCAL_REPO_DIR=%~dp0"
+set "LOCAL_VERSION=1.1"
 
-if exist "%LOCAL_VERSION_FILE%" (
-    for /f "delims=" %%i in ('type "%LOCAL_VERSION_FILE%"') do set "LOCAL_VERSION=%%i"
-) else (
-    set "LOCAL_VERSION=unknown"
-)
+:: Fetch the latest version from Pastebin
+for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
 
-for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri %LATEST_VERSION_FILE%).Content"') do set "LATEST_VERSION=%%i"
-
+:: Compare versions
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
-    echo Your script is up-to-date! Version: %COLOR_GREEN%%LOCAL_VERSION%%COLOR_RESET%.
+    echo %COLOR_GREEN%You are using the latest version: %LOCAL_VERSION%%COLOR_RESET%.
     pause
     goto main_menu
 ) else (
     echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%.
-    echo Your current version: %COLOR_YELLOW%%LOCAL_VERSION%%COLOR_RESET%.
-    echo %COLOR_RED%It is recommended to update to the latest version.%COLOR_RESET%
+    echo Your current version is: %COLOR_YELLOW%%LOCAL_VERSION%%COLOR_RESET%.
+    echo %COLOR_DARK_RED%Please update the script to the latest version.%COLOR_RESET%
     echo.
+    :ask_update
+    echo Do you want to download and update to the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
+    set /p install_update="< "
 )
+    if /i "%install_update%"=="y" (
+        :: Notify the user
+        echo Downloading the latest version from GitHub...
+        
+        :: Download the latest version's ZIP file from GitHub (dev branch)
+        powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/dev.zip -OutFile WinConfigs.zip"
+        
+        :: Check if the file was downloaded
+        if exist WinConfigs.zip (
+            echo ZIP file downloaded successfully.
+            
+            :: Extract the ZIP file
+            powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
+            
+            :: Remove existing files in the current directory (if any) before moving new ones
+            echo Removing old files...
+            rmdir /s /q ASCII
+            rmdir /s /q Assets
+            rmdir /s /q Configuration
+            rmdir /s /q Scripts
+            rmdir /s /q Version
 
-:ask_update
-echo Do you want to update to the latest version? %COLOR_YELLOW%Y/N%COLOR_RESET%
-set /p install_update="< "
+            :: Move files from extracted folder to current folder (after extraction, the folder is named WinConfigs-dev)
+            powershell -Command "Move-Item -Path '.\WinConfigs-dev\*' -Destination . -Force"
+            
+            :: Clean up by deleting the extracted folder and ZIP file
+            rmdir /s /q WinConfigs-dev
+            del WinConfigs.zip
+            
+            :: Notify user and restart the script
+            echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%.
+            echo Restarting the script...
+            timeout /t 2 >nul
 
-if /i "%install_update%"=="y" (
-    :: Check if script is in a Git repo
-    if exist "%LOCAL_REPO_DIR%.git" (
-        echo Pulling latest changes from GitHub...
-        powershell -Command "cd '%LOCAL_REPO_DIR%' ; git pull"
-    ) else (
-        echo Cloning the repository to get the latest version...
-        powershell -Command "cd ..; git clone %GITHUB_REPO%"
+            :: Restart the script (with start)
+            start "" "%~dp0WinConfigs.bat"
+            exit
+        ) else (
+            echo %COLOR_RED%Failed to download the ZIP file. Please check your network connection.%COLOR_RESET%
+            pause
+            goto main_menu
+        )
+    ) else if /i "%install_update%"=="n" (
+        echo Update canceled. Returning to the main menu...
+        pause
+        goto main_menu
     )
-    echo %COLOR_GREEN%Update complete! Restarting the script...%COLOR_RESET%
-    timeout /t 2 >nul
-    call "%~dp0WinConfigs.bat"
-    exit
-) else if /i "%install_update%"=="n" (
-    goto main_menu
-)
 
 
 
