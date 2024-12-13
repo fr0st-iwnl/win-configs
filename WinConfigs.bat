@@ -395,7 +395,7 @@ set /p confirm_uninstall_apps="< "
 
 if /i "%confirm_uninstall_apps%"=="y" (
     echo %COLOR_YELLOW%Uninstalling all Scoop apps...%COLOR_RESET%
-    powershell -Command "scoop list | %{ scoop uninstall $_.Name }"
+    powershell -Command "if ((scoop list | Measure-Object).Count -ne 0) { scoop list | ForEach-Object { $_.Name } | ForEach-Object { scoop uninstall $_ } }"
     if errorlevel 1 (
         echo %COLOR_RED%Failed to uninstall some Scoop apps. Please check manually.%COLOR_RESET%
         pause
@@ -403,10 +403,11 @@ if /i "%confirm_uninstall_apps%"=="y" (
     )
     echo %COLOR_GREEN%All Scoop apps have been uninstalled successfully!%COLOR_RESET%
 ) else (
-    echo %COLOR_LIGHT_RED%Uninstallation canceled. Returning to Package Manager menu.%COLOR_RESET%
+    echo %COLOR_RED%Uninstallation canceled. Returning to Package Manager menu.%COLOR_RESET%
     pause
     goto package_manager
 )
+
 
 echo %COLOR_YELLOW%Now uninstalling Scoop itself...%COLOR_RESET%
 powershell -Command "scoop uninstall scoop"
