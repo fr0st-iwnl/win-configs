@@ -51,15 +51,13 @@ set "COLOR_MAGENTA=%ESC%[35m"
 ::-------------------
 :: VERSION CHECK
 ::-------------------
-set "LOCAL_VERSION=1.2"
+set "LOCAL_VERSION=1.3"
 
 :: Fetch the latest version from Pastebin
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
 
 :: Compare versions
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
-    echo %COLOR_GREEN%You are using the latest version: %LOCAL_VERSION%%COLOR_RESET%.
-    pause
     goto main_menu
 ) else (
     echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%.
