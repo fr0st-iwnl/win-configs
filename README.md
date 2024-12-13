@@ -1,5 +1,22 @@
-# ⚙️ \\\ WinConfigs
-A simple batch script to manage Windows utilities, system info, repositories, and performance tweaks.
+<div align="center">
+  <h1>⚙️ \\ WinConfigs</h1>
+  <table>
+    <tr>
+      <td>
+        <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/preview2.png"/>
+      </td>
+    </tr>
+  </table>
+  <p><strong>A simple batch script to manage Windows utilities, system info, repositories, and performance tweaks.</strong></p>
+</div>
+
+<p align="center">
+  <a href="#-installation">Installation</a> •
+	<a href="#-features">Features</a> •
+	<a href="#-configuration">Configuration</a> •
+	<a href="#-credits">Credits</a>
+</p>
+
 
 ## 📦 Installation 
 
@@ -8,6 +25,51 @@ A simple batch script to manage Windows utilities, system info, repositories, an
 ```
 git clone https://github.com/fr0st-iwnl/WinConfigs.git
 ```
+
+## ✨ Features
+
+<details>
+<summary>📦 Package Management</summary>
+
+- **Scoop Package Manager**
+  - Install, update, and manage software using **Scoop**.
+  - **Customize the packages** you want to install by editing the `.txt` file located in the `Configuration/scoop-packages/packages-list.txt`.
+  <br>
+  <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/packagemanager.png" width="30%">
+
+</details>
+
+<details>
+<summary>🔧 Custom Repositories</summary>
+
+- **Personal Repository Setup**
+  - The script allows you to manage your own custom repositories.
+  - Simply add repository URLs to a `.txt` file located in the `Configuration/custom-repos/repos-list.txt`, and the script will automatically download and manage them using **Git**.
+  <br>
+  <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/customrepos.png" width="60%">
+
+</details>
+
+<details>
+<summary>🖥️ System Utilities</summary>
+
+- **Ntop and Fastfetch Integration**
+  - The script comes with useful system utilities like **Ntop** for network monitoring and **Fastfetch** for displaying system information.
+  - These tools provide real-time network stats and quick system info at your fingertips, enhancing your system management experience.
+
+</details>
+
+
+<details>
+<summary>⚙️ System Tweaks</summary>
+
+- **Performance Tweaks**
+  - Optimizes system performance by adjusting settings with **WinUtil**.
+  - Includes tweaks for system responsiveness and efficiency.
+
+</details>
+
+
 
 ## 🔧 Configuration
 
@@ -34,17 +96,21 @@ Each repository will be listed with a prompt when you run the script, asking if 
 
 
 
-## 🔍 Preview
+## 🔄 Credits
 
-<div align="left">
-  <table>
-    <tr>
-      <td>
-        <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/preview.png"/>
-      </td>
-    </tr>
-  </table>
-</div>
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/ChrisTitusTech/winutil/blob/main/docs/assets/favicon.png?raw=true" width="60px" alt="WinUtil"><br/>
+<b><a href="https://github.com/ChrisTitusTech/winutil">WinUtil</a></b><br/>
+<sub>Best Windows Utility</sub>
+</td>
+<td align="center">
+<img src="https://avatars.githubusercontent.com/u/16618068?s=200&v=4" width="60px" alt="Scoop"><br/>
+<b><a href="https://scoop.sh/">Scoop</a></b><br/>
+<sub>Package Manager</sub>
+</td>
+</table>
 
 ## 📝 TODO's
 
