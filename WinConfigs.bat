@@ -49,74 +49,34 @@ set "COLOR_WHITE=%ESC%[97m"
 set "COLOR_MAGENTA=%ESC%[35m"
 
 ::-------------------
-:: VERSION CHECK
+:: VERSION
 ::-------------------
 set "LOCAL_VERSION=1.2"
 
-:: Fetch the latest version from Pastebin
-for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
+for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content"') do set "LATEST_VERSION=%%i"
 
-:: Compare versions
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
-    echo %COLOR_GREEN%You are using the latest version: %LOCAL_VERSION%%COLOR_RESET%.
-    pause
     goto main_menu
 ) else (
-    echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%.
+    echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%. 
     echo Your current version is: %COLOR_YELLOW%%LOCAL_VERSION%%COLOR_RESET%.
     echo %COLOR_DARK_RED%Please update the script to the latest version.%COLOR_RESET%
     echo.
     :ask_update
-    echo Do you want to download and update to the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
+    echo Do you want to download and install the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
     set /p install_update="< "
 )
     if /i "%install_update%"=="y" (
-        :: Notify the user
+        :: Download and Install the latest version
         echo Downloading the latest version from GitHub...
-        
-        :: Download the latest version's ZIP file from GitHub (dev branch)
-        powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/dev.zip -OutFile WinConfigs.zip"
-        
-        :: Check if the file was downloaded
-        if exist WinConfigs.zip (
-            echo ZIP file downloaded successfully.
-            
-            :: Extract the ZIP file
-            powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
-            
-            :: Remove existing files in the current directory (if any) before moving new ones
-            echo Removing old files...
-            rmdir /s /q ASCII
-            rmdir /s /q Assets
-            rmdir /s /q Configuration
-            rmdir /s /q Scripts
-            rmdir /s /q Version
-
-            :: Move files from extracted folder to current folder (after extraction, the folder is named WinConfigs-dev)
-            powershell -Command "Move-Item -Path '.\WinConfigs-dev\*' -Destination . -Force"
-            
-            :: Clean up by deleting the extracted folder and ZIP file
-            rmdir /s /q WinConfigs-dev
-            del WinConfigs.zip
-            
-            :: Notify user and restart the script
-            echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%.
-            echo Restarting the script...
-            timeout /t 2 >nul
-
-            :: Restart the script (with start)
-            start "" "%~dp0WinConfigs.bat"
-            exit
-        ) else (
-            echo %COLOR_RED%Failed to download the ZIP file. Please check your network connection.%COLOR_RESET%
-            pause
-            goto main_menu
-        )
+        powershell -Command "Invoke-WebRequest -Uri https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/master/WinConfigs.bat -OutFile WinConfigs.bat"
+        echo Latest version has been downloaded and installed.
+        echo Restarting the script...
+        timeout /t 2 >nul
+        call WinConfigs.bat
     ) else if /i "%install_update%"=="n" (
-        echo Update canceled. Returning to the main menu...
-        pause
-        goto main_menu
-    )
+    goto main_menu
+)
 
 
 ::-------------------
