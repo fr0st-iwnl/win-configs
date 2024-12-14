@@ -81,7 +81,7 @@ git clone https://github.com/fr0st-iwnl/WinConfigs.git
 ## 🔧 Configuration
 
 ### Customizing Packages List (Scoop)
-To configure the packages that will be installed by Scoop, you can modify the `packages-list.txt` file located in the `Configuration\scoop-packages\` directory. Simply open the file and add or remove package names as needed. Each line should contain one package name that you wish to install. Here’s an example of how the file might look:
+To configure the packages that will be installed by [Scoop](https://scoop.sh/#/apps), you can modify the `packages-list.txt` file located in the `Configuration\scoop-packages\` directory. Simply open the file and add or remove package names as needed. Each line should contain one package name that you wish to install. Here’s an example of how the file might look:
 
 ```yml
 git
