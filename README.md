@@ -21,9 +21,15 @@
 
 ## 📦 Installation 
 
-### 1. Download the repository
-- Clone this repository or download the ZIP. **If you downloaded the ZIP, make sure to extract it before running the script.**
+### 1. Download the repository using PowerShell
+- Run the following PowerShell command to download the repository and extract it on **Desktop**:
+```powershell
+iwr "https://fr0st.xyz/winconfigs" | iex
 ```
+
+### 2. Download the repository
+- Clone this repository or download the ZIP. **If you downloaded the ZIP, make sure to extract it before running the script.**
+```bash
 git clone https://github.com/fr0st-iwnl/WinConfigs.git
 ```
 
