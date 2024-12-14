@@ -82,9 +82,10 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
             echo.
             
             echo Removing old files...
-            if exist ASCII rmdir /s /q ASCII
-            if exist Assets rmdir /s /q Assets
-            if exist Configuration rmdir /s /q Configuration
+            
+            for %%d in (ASCII Assets Configuration Scripts) do (
+                if exist %%d rmdir /s /q %%d
+            )
 
             echo Moving new files...
             powershell -Command "Move-Item -Path '.\WinConfigs-master\*' -Destination . -Force"
