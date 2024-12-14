@@ -86,9 +86,27 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
             for %%d in (ASCII Assets Configuration Scripts) do (
                 if exist %%d rmdir /s /q %%d
             )
+            
+            :: Preserve custom configuration files
+            echo Preserving user configuration files...
+            if exist Configuration\custom-repos\repos-list.txt (
+                copy /y "Configuration\custom-repos\repos-list.txt" "%TEMP%\repos-list.txt"
+            )
+            if exist Configuration\scoop-packages\packages-list.txt (
+                copy /y "Configuration\scoop-packages\packages-list.txt" "%TEMP%\packages-list.txt"
+            )
 
             echo Moving new files...
             powershell -Command "Move-Item -Path '.\WinConfigs-master\*' -Destination . -Force"
+
+            :: Restore preserved files
+            echo Restoring user configuration files...
+            if exist "%TEMP%\repos-list.txt" (
+                copy /y "%TEMP%\repos-list.txt" "Configuration\custom-repos\repos-list.txt"
+            )
+            if exist "%TEMP%\packages-list.txt" (
+                copy /y "%TEMP%\packages-list.txt" "Configuration\scoop-packages\packages-list.txt"
+            )
             
             del WinConfigs.zip
             rmdir /s /q WinConfigs-master
