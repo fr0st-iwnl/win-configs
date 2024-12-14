@@ -8,7 +8,7 @@
       </td>
     </tr>
   </table>
-  <p><strong>A simple batch script to manage Windows utilities, system info, repositories, and performance tweaks.</strong></p>
+  <p><strong>A simple batch script to automate Windows setup, software, and tweaks.</strong></p>
 </div>
 
 <p align="center">
