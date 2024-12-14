@@ -58,76 +58,74 @@ for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://p
 if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
     goto main_menu
 ) else (
-    echo A new version is available: %COLOR_LIGHT_YELLOW%%LATEST_VERSION%%COLOR_RESET%.
-    echo Your current version is: %COLOR_YELLOW%%LOCAL_VERSION%%COLOR_RESET%.
+    echo %COLOR_LIGHT_YELLOW%A new version is available: %LATEST_VERSION%%COLOR_RESET%.
+    echo %COLOR_YELLOW%Your current version is: %LOCAL_VERSION%%COLOR_RESET%.
     echo %COLOR_DARK_RED%Please update the script to the latest version.%COLOR_RESET%
     echo.
     :ask_update
     echo Do you want to download and update to the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
     set /p install_update="< "
 )
-    if /i "%install_update%"=="y" (
-        echo Downloading the latest version from GitHub...
+
+if /i "%install_update%"=="y" (
+    echo %COLOR_LIGHT_CYAN%Downloading the latest version from GitHub...%COLOR_RESET%
+    
+    powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip -OutFile WinConfigs.zip"
+    
+    if exist WinConfigs.zip (
+        echo %COLOR_GREEN%ZIP file downloaded successfully.%COLOR_RESET%
         
-        powershell -Command "Invoke-WebRequest -Uri https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip -OutFile WinConfigs.zip"
+        powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
         
-        if exist WinConfigs.zip (
-            echo ZIP file downloaded successfully.
-            
-            powershell -Command "Expand-Archive -Path WinConfigs.zip -DestinationPath . -Force"
-            
-            echo.
-            echo Files after extraction:
-            dir /b /s WinConfigs-master
-            echo.
-            
-            echo Removing old files...
-            
-            for %%d in (ASCII Assets Configuration Scripts) do (
-                if exist %%d rmdir /s /q %%d
-            )
-            
-            :: Preserve custom configuration files
-            echo Preserving user configuration files...
-            if exist Configuration\custom-repos\repos-list.txt (
-                copy /y "Configuration\custom-repos\repos-list.txt" "%TEMP%\repos-list.txt"
-            )
-            if exist Configuration\scoop-packages\packages-list.txt (
-                copy /y "Configuration\scoop-packages\packages-list.txt" "%TEMP%\packages-list.txt"
-            )
-
-            echo Moving new files...
-            powershell -Command "Move-Item -Path '.\WinConfigs-master\*' -Destination . -Force"
-
-            :: Restore preserved files
-            echo Restoring user configuration files...
-            if exist "%TEMP%\repos-list.txt" (
-                copy /y "%TEMP%\repos-list.txt" "Configuration\custom-repos\repos-list.txt"
-            )
-            if exist "%TEMP%\packages-list.txt" (
-                copy /y "%TEMP%\packages-list.txt" "Configuration\scoop-packages\packages-list.txt"
-            )
-            
-            del WinConfigs.zip
-            rmdir /s /q WinConfigs-master
-            
-            echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%.
-            echo Restarting the script...
-            timeout /t 2 >nul
-
-            start "" "%~dp0WinConfigs.bat"
-            exit
-        ) else (
-            echo %COLOR_RED%Failed to download the ZIP file. Please check your network connection.%COLOR_RESET%
-            pause
-            goto main_menu
+        echo.
+        echo %COLOR_LIGHT_YELLOW%Files after extraction:%COLOR_RESET%
+        dir /b /s WinConfigs-master
+        echo.
+        
+        echo %COLOR_CYAN%Preserving user configuration files...%COLOR_RESET%
+        
+        if exist "Configuration\custom-repos\repos-list.txt" (
+            move /y "Configuration\custom-repos\repos-list.txt" "%TEMP%\repos-list-user.txt" >nul
         )
-    ) else if /i "%install_update%"=="n" (
-        echo Update canceled. Returning to the main menu...
+        if exist "Configuration\scoop-packages\packages-list.txt" (
+            move /y "Configuration\scoop-packages\packages-list.txt" "%TEMP%\packages-list-user.txt" >nul
+        )
+        
+        echo %COLOR_YELLOW%Removing old files...%COLOR_RESET%
+        for %%d in (ASCII Assets Configuration Scripts) do (
+            if exist %%d rmdir /s /q %%d
+        )
+        
+        echo %COLOR_LIGHT_CYAN%Moving new files...%COLOR_RESET%
+        powershell -Command "Move-Item -Path '.\WinConfigs-master\*' -Destination . -Force"
+        
+        echo %COLOR_LIGHT_YELLOW%Restoring user configuration files...%COLOR_RESET%
+        if exist "%TEMP%\repos-list-user.txt" (
+            move /y "%TEMP%\repos-list-user.txt" "Configuration\custom-repos\repos-list.txt" >nul
+        )
+        if exist "%TEMP%\packages-list-user.txt" (
+            move /y "%TEMP%\packages-list-user.txt" "Configuration\scoop-packages\packages-list.txt" >nul
+        )
+        
+        del WinConfigs.zip
+        rmdir /s /q WinConfigs-master
+        
+        echo %COLOR_GREEN%The latest version has been downloaded and installed!%COLOR_RESET%
+        echo %COLOR_LIGHT_CYAN%Restarting the script...%COLOR_RESET%
+        timeout /t 2 >nul
+        
+        start "" "%~dp0WinConfigs.bat"
+        exit
+    ) else (
+        echo %COLOR_RED%Failed to download the ZIP file. Please check your network connection.%COLOR_RESET%
         pause
         goto main_menu
     )
-
+) else if /i "%install_update%"=="n" (
+    echo %COLOR_YELLOW%Update canceled. Returning to the main menu...%COLOR_RESET%
+    pause
+    goto main_menu
+)
 
 
 
