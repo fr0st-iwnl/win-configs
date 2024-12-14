@@ -22,7 +22,7 @@
 ## 📦 Installation 
 
 ### 1. Download the repository using PowerShell
-- Run the following PowerShell command to download the repository and extract it on **Desktop**:
+- Run the following `PowerShell` command to download and extract the repository directly to your **Desktop**:
 ```powershell
 iwr "https://fr0st.xyz/winconfigs" | iex
 ```
