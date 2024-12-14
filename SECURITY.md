@@ -40,4 +40,3 @@ We currently support WinConfigs on the latest version, as well as on prior relea
 Security Policy Changes
 
 We reserve the right to update this security policy as needed. Please review this document periodically for any changes. You will be notified of major changes through our GitHub repository.
-Contributions
