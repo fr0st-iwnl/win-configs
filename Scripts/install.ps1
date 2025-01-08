@@ -1,47 +1,58 @@
 # Define variables
 $repoUrl = "https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip"
-$destinationFolder = "$env:USERPROFILE\Desktop\WinConfigs"
+$desktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
 $tempZip = "$env:TEMP\WinConfigs.zip"
-$shortcutPath = "$env:USERPROFILE\Desktop\WinConfigs.lnk"
-$iconPath = "$destinationFolder\Assets\icon.ico"
+$iconUrl = "https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/icon.ico"
+$iconPath = "$env:APPDATA\icon.ico"
+$extractedFolder = "$env:LOCALAPPDATA\Temp\WinConfigs"  # Extracted folder location in AppData\Local\Temp
+$shortcutPath = "$desktopPath\WinConfigs.lnk"  # Shortcut will be on Desktop
 
 # Step 1: Download the ZIP file
 Write-Host "Downloading the repository..." -ForegroundColor Cyan
 Invoke-WebRequest -Uri $repoUrl -OutFile $tempZip
 
-# Step 2: Check if the destination folder already exists
-if (Test-Path -Path $destinationFolder) {
-    Write-Host "Destination folder already exists. Cleaning up..." -ForegroundColor Yellow
-    Remove-Item -Path "$destinationFolder\*" -Recurse -Force
-} else {
-    # Step 3: Create the destination folder if it doesn't exist
-    Write-Host "Creating the destination folder..." -ForegroundColor Cyan
-    New-Item -ItemType Directory -Path $destinationFolder | Out-Null
+# Step 2: Clean up any existing folder in the Temp directory
+if (Test-Path -Path $extractedFolder) {
+    Write-Host "Removing old extracted folder..." -ForegroundColor Yellow
+    Remove-Item -Path $extractedFolder -Recurse -Force
 }
 
-# Step 4: Extract the ZIP file to the destination folder
-Write-Host "Extracting the repository to Desktop..." -ForegroundColor Cyan
-Expand-Archive -Path $tempZip -DestinationPath $destinationFolder -Force
+# Step 3: Create the directory for extraction
+Write-Host "Creating directory for extraction..." -ForegroundColor Cyan
+New-Item -ItemType Directory -Path $extractedFolder | Out-Null
+
+# Step 4: Extract the ZIP file to the specified folder in Temp
+Write-Host "Extracting the repository..." -ForegroundColor Cyan
+Expand-Archive -Path $tempZip -DestinationPath $extractedFolder -Force
 
 # Step 5: Handle double folder structure (if any)
-$innerFolder = Get-ChildItem -Path $destinationFolder -Directory | Select-Object -First 1
+$innerFolder = Get-ChildItem -Path $extractedFolder -Directory | Select-Object -First 1
 if ($innerFolder.Name -match "WinConfigs-master") {
     Write-Host "Fixing folder structure..." -ForegroundColor Yellow
-    Move-Item -Path "$($innerFolder.FullName)\*" -Destination $destinationFolder -Force
+    Move-Item -Path "$($innerFolder.FullName)\*" -Destination $extractedFolder -Force
     Remove-Item -Path $innerFolder.FullName -Recurse -Force
 }
 
 # Step 6: Cleanup the temporary ZIP file
 Remove-Item -Path $tempZip -Force
 
-# Step 7: Create a shortcut on the desktop
-Write-Host "Creating a desktop shortcut for the folder..." -ForegroundColor Cyan
+# Step 7: Download the icon file
+Write-Host "Downloading the icon file..." -ForegroundColor Cyan
+Invoke-WebRequest -Uri $iconUrl -OutFile $iconPath
+
+# Step 8: Create the desktop shortcut
+Write-Host "Creating a desktop shortcut..." -ForegroundColor Cyan
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
-$shortcut.TargetPath = $destinationFolder
-$shortcut.WorkingDirectory = $destinationFolder
+
+# Set the target to the folder where the files are extracted
+$shortcut.TargetPath = $extractedFolder
+$shortcut.WorkingDirectory = $extractedFolder
 $shortcut.WindowStyle = 1
-$shortcut.IconLocation = $iconPath # Use the icon that is already in the extracted folder
+$shortcut.IconLocation = $iconPath # Use the downloaded icon
 $shortcut.Save()
 
-Write-Host "Repository downloaded, extracted, and shortcut created on Desktop." -ForegroundColor Green
+# Step 9: Optional: Remove the extracted folder from Temp if no longer needed (comment out if you want to keep)
+# Remove-Item -Path $extractedFolder -Recurse -Force
+
+Write-Host "Repository downloaded, extracted to AppData\Local\Temp, and shortcut created on Desktop." -ForegroundColor Green
