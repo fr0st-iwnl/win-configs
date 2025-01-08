@@ -3,7 +3,6 @@ $repoUrl = "https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.z
 $destinationFolder = "$env:USERPROFILE\Desktop\WinConfigs"
 $tempZip = "$env:TEMP\WinConfigs.zip"
 $shortcutPath = "$env:USERPROFILE\Desktop\WinConfigs.lnk"
-$iconUrl = "https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/icon.ico"
 $iconPath = "$destinationFolder\Assets\icon.ico"
 
 # Step 1: Download the ZIP file
@@ -35,18 +34,14 @@ if ($innerFolder.Name -match "WinConfigs-master") {
 # Step 6: Cleanup the temporary ZIP file
 Remove-Item -Path $tempZip -Force
 
-# Step 7: Download the icon
-Write-Host "Downloading the icon file..." -ForegroundColor Cyan
-Invoke-WebRequest -Uri $iconUrl -OutFile $iconPath
-
-# Step 8: Create a shortcut on the desktop
+# Step 7: Create a shortcut on the desktop
 Write-Host "Creating a desktop shortcut for the folder..." -ForegroundColor Cyan
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $destinationFolder
 $shortcut.WorkingDirectory = $destinationFolder
 $shortcut.WindowStyle = 1
-$shortcut.IconLocation = $iconPath # Use the downloaded icon
+$shortcut.IconLocation = $iconPath # Use the icon that is already in the extracted folder
 $shortcut.Save()
 
 Write-Host "Repository downloaded, extracted, and shortcut created on Desktop." -ForegroundColor Green
