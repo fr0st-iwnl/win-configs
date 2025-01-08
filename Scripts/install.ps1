@@ -3,7 +3,6 @@ $repoUrl = "https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.z
 $desktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
 $tempZip = "$env:TEMP\WinConfigs.zip"
 $iconUrl = "https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/icon.ico"
-$iconPath = "$env:APPDATA\icon.ico"
 $extractedFolder = "$env:LOCALAPPDATA\Temp\WinConfigs"  # Extracted folder location in AppData\Local\Temp
 $shortcutPath = "$desktopPath\WinConfigs.lnk"  # Shortcut will be on Desktop
 
@@ -36,9 +35,9 @@ if ($innerFolder.Name -match "WinConfigs-master") {
 # Step 6: Cleanup the temporary ZIP file
 Remove-Item -Path $tempZip -Force
 
-# Step 7: Download the icon file
+# Step 7: Download the icon file to the Assets folder
 Write-Host "Downloading the icon file..." -ForegroundColor Cyan
-Invoke-WebRequest -Uri $iconUrl -OutFile $iconPath
+Invoke-WebRequest -Uri $iconUrl -OutFile "$extractedFolder\Assets\icon.ico"
 
 # Step 8: Create the desktop shortcut
 Write-Host "Creating a desktop shortcut..." -ForegroundColor Cyan
@@ -49,7 +48,7 @@ $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = $extractedFolder
 $shortcut.WorkingDirectory = $extractedFolder
 $shortcut.WindowStyle = 1
-$shortcut.IconLocation = $iconPath # Use the downloaded icon
+$shortcut.IconLocation = "$extractedFolder\Assets\icon.ico" # Use the downloaded icon from the extracted folder
 $shortcut.Save()
 
 # Step 9: Optional: Remove the extracted folder from Temp if no longer needed (comment out if you want to keep)
