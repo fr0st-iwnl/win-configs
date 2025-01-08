@@ -1,6 +1,6 @@
 @echo off
 cls
-
+title "WinConfigs v1.4 | made by @fr0st-iwnl"
 
 ::========================================================================================================
 ::
@@ -261,6 +261,7 @@ echo.
 echo Installing Scoop...
 powershell -Command "Set-ExecutionPolicy RemoteSigned -scope CurrentUser"
 powershell -Command "irm get.scoop.sh | iex"
+
 if errorlevel 1 (
     echo %COLOR_RED%Failed to install Scoop. Please check your internet connection.%COLOR_RESET%
     pause
@@ -268,10 +269,13 @@ if errorlevel 1 (
 )
 echo %COLOR_GREEN%Scoop installed successfully!%COLOR_RESET%
 echo.
-echo %COLOR_YELLOW%RESTARTING SCRIPT TO MAKE THE SCOOP COMMAND WORK...%COLOR_RESET%
+echo %COLOR_YELLOW%RESTARTING SCRIPT TO UPDATE THE PATH FOR SCOOP...%COLOR_RESET%
 echo.
 powershell -Command "[console]::beep(600, 300)"
 timeout /t 3 > nul
+:: Reload the PATH into the current session
+set PATH=%PATH%;%USERPROFILE%\scoop\shims
+:: Restart the script
 start "" "%~f0"
 exit
 
