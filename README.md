@@ -130,3 +130,4 @@ Each repository will be listed with a prompt when you run the script, asking if 
 - [x] Update the script to install custom repositories from a `.txt` file or redesign the installation process for them.
 - [x] Improve version handling in the script for better version tracking and updates.
 - [x] Improve the script and fix minor bugs for smoother user experience.
+- [ ] Add a new category called "Tweaks" in the main menu.
