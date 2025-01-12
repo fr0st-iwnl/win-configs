@@ -1,6 +1,6 @@
 @echo off
 cls
-title "WinConfigs v1.4 | made by @fr0st-iwnl"
+title "WinConfigs v1.3 | made by @fr0st-iwnl"
 
 ::========================================================================================================
 ::
