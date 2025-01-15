@@ -2,8 +2,3 @@ git
 nodejs
 fastfetch
 ntop
-qbittorrent
-chromium
-obs-studio
-neovim
-flameshot
