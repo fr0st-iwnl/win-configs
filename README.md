@@ -110,12 +110,22 @@ Each repository will be listed with a prompt when you run the script, asking if 
 <td align="center">
 <img src="https://github.com/ChrisTitusTech/winutil/blob/main/docs/assets/favicon.png?raw=true" width="60px" alt="WinUtil"><br/>
 <b><a href="https://github.com/ChrisTitusTech/winutil">WinUtil</a></b><br/>
-<sub>Best Windows Utility</sub>
+<sub>WinUtil</sub>
 </td>
 <td align="center">
 <img src="https://avatars.githubusercontent.com/u/16618068?s=200&v=4" width="60px" alt="Scoop"><br/>
 <b><a href="https://scoop.sh/">Scoop</a></b><br/>
 <sub>Package Manager</sub>
+</td>
+<td align="center">
+<img src="https://avatars.githubusercontent.com/u/65787561?v=4" width="60px" alt="h3als"><br/>
+<b><a href="https://github.com/he3als/EdgeRemover">h3als</a></b><br/>
+<sub>EdgeRemover</sub>
+</td>
+<td align="center">
+<img src="https://avatars.githubusercontent.com/u/59795046?s=200&v=4" width="60px" alt="MAS"><br/>
+<b><a href="https://github.com/massgravel/Microsoft-Activation-Scripts">MAS</a></b><br/>
+<sub>MAS</sub>
 </td>
 </table>
 
