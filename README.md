@@ -4,7 +4,7 @@
   <table>
     <tr>
       <td>
-        <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/preview2.png"/>
+        <img src="https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/preview.png"/>
       </td>
     </tr>
   </table>
