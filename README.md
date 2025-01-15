@@ -127,6 +127,11 @@ Each repository will be listed with a prompt when you run the script, asking if 
 <b><a href="https://github.com/massgravel/Microsoft-Activation-Scripts">MAS</a></b><br/>
 <sub>MAS</sub>
 </td>
+<td align="center">
+<img src="https://avatars.githubusercontent.com/u/76656855?v=4" width="60px" alt="WDR"><br/>
+<b><a href="https://github.com/ionuttbara/windows-defender-remover">ionuttbara</a></b><br/>
+<sub>WDR</sub>
+</td>
 </table>
 
 ## 📝 TODO's
