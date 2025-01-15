@@ -10,15 +10,24 @@ $shortcutPath = "$desktopPath\WinConfigs.lnk"  # Shortcut will be on Desktop
 Write-Host "Downloading the repository..." -ForegroundColor Cyan
 Invoke-WebRequest -Uri $repoUrl -OutFile $tempZip
 
-# Step 2: Clean up any existing folder in the Temp directory
+# Step 2: Clean up any existing folder in the Temp directory (Force deletion)
 if (Test-Path -Path $extractedFolder) {
     Write-Host "Removing old extracted folder..." -ForegroundColor Yellow
-    Remove-Item -Path $extractedFolder -Recurse -Force
+    # Attempt to remove the folder and forcefully remove it
+    try {
+        # Try deleting the folder
+        Remove-Item -Path $extractedFolder -Recurse -Force -ErrorAction Stop
+    } catch {
+        Write-Host "Could not remove existing folder. Trying again..." -ForegroundColor Red
+        # If there was an issue, wait for a few seconds and retry
+        Start-Sleep -Seconds 3
+        Remove-Item -Path $extractedFolder -Recurse -Force -ErrorAction Stop
+    }
 }
 
-# Step 3: Create the directory for extraction
+# Step 3: Create the directory for extraction (will recreate if it was deleted)
 Write-Host "Creating directory for extraction..." -ForegroundColor Cyan
-New-Item -ItemType Directory -Path $extractedFolder | Out-Null
+New-Item -ItemType Directory -Path $extractedFolder -Force | Out-Null
 
 # Step 4: Extract the ZIP file to the specified folder in Temp
 Write-Host "Extracting the repository..." -ForegroundColor Cyan
@@ -35,11 +44,11 @@ if ($innerFolder.Name -match "WinConfigs-master") {
 # Step 6: Cleanup the temporary ZIP file
 Remove-Item -Path $tempZip -Force
 
-# Step 7: Download the icon file to the Assets folder
+# Step 7: Download the icon file to the Assets folder (will overwrite if exists)
 Write-Host "Downloading the icon file..." -ForegroundColor Cyan
 Invoke-WebRequest -Uri $iconUrl -OutFile "$extractedFolder\Assets\icon.ico"
 
-# Step 8: Create the desktop shortcut
+# Step 8: Create the desktop shortcut (will overwrite if exists)
 Write-Host "Creating a desktop shortcut..." -ForegroundColor Cyan
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
