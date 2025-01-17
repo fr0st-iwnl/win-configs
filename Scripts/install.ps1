@@ -50,6 +50,14 @@ Invoke-WebRequest -Uri $iconUrl -OutFile "$extractedFolder\Assets\icon.ico"
 
 # Step 8: Create the desktop shortcut (will overwrite if exists)
 Write-Host "Creating a desktop shortcut..." -ForegroundColor Cyan
+
+# Ensure the Desktop directory exists
+if (-not (Test-Path -Path $desktopPath)) {
+    Write-Host "Creating the Desktop directory..." -ForegroundColor Yellow
+    New-Item -ItemType Directory -Path $desktopPath -Force | Out-Null
+}
+
+# Create the shortcut using COM object
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 
@@ -58,6 +66,8 @@ $shortcut.TargetPath = $extractedFolder
 $shortcut.WorkingDirectory = $extractedFolder
 $shortcut.WindowStyle = 1
 $shortcut.IconLocation = "$extractedFolder\Assets\icon.ico" # Use the downloaded icon from the extracted folder
+
+# Save the shortcut
 $shortcut.Save()
 
 # Step 9: Optional: Remove the extracted folder from Temp if no longer needed (comment out if you want to keep)
