@@ -1,9 +1,9 @@
 # Define variables
 $repoUrl = "https://github.com/fr0st-iwnl/WinConfigs/archive/refs/heads/master.zip"
 $desktopPath = [System.IO.Path]::Combine($env:USERPROFILE, "Desktop")
-$tempZip = "$env:TEMP\WinConfigs.zip"
+$tempZip = "$env:LOCALAPPDATA\WinConfigs.zip"
 $iconUrl = "https://raw.githubusercontent.com/fr0st-iwnl/WinConfigs/refs/heads/master/Assets/icon.ico"
-$extractedFolder = "$env:LOCALAPPDATA\Temp\WinConfigs"  # Extracted folder location in AppData\Local\Temp
+$extractedFolder = "$env:LOCALAPPDATA\WinConfigs"  # Extracted folder location in AppData\Local\Temp
 $shortcutPath = "$desktopPath\WinConfigs.lnk"  # Shortcut will be on Desktop
 
 # Step 1: Download the ZIP file
@@ -73,4 +73,4 @@ $shortcut.Save()
 # Step 9: Optional: Remove the extracted folder from Temp if no longer needed (comment out if you want to keep)
 # Remove-Item -Path $extractedFolder -Recurse -Force
 
-Write-Host "Repository downloaded, extracted to AppData\Local\Temp, and shortcut created on Desktop." -ForegroundColor Green
+Write-Host "Repository downloaded, extracted to AppData\Local\, and shortcut created on Desktop." -ForegroundColor Green
