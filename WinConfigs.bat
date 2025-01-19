@@ -1,6 +1,6 @@
 @echo off
 cls
-title "WinConfigs v1.4 | made by @fr0st-iwnl"
+title "WinConfigs v1.5 | made by @fr0st-iwnl"
 
 ::========================================================================================================
 ::
@@ -51,7 +51,7 @@ set "COLOR_MAGENTA=%ESC%[35m"
 ::-------------------
 :: VERSION CHECK
 ::-------------------
-set "LOCAL_VERSION=1.4"
+set "LOCAL_VERSION=1.5"
 
 for /f "delims=" %%i in ('powershell -Command "(Invoke-WebRequest -Uri https://pastebin.com/raw/ikwbpnXd).Content.Trim()"') do set "LATEST_VERSION=%%i"
 
@@ -178,7 +178,8 @@ echo %COLOR_GREEN%[4] Search Indexing%COLOR_RESET%
 echo %COLOR_GREEN%[5] Themes%COLOR_RESET%
 echo %COLOR_GREEN%[6] Context Menu%COLOR_RESET%
 echo %COLOR_GREEN%[7] Notifications%COLOR_RESET%
-echo %COLOR_RED%[8] Remove Windows Defender%COLOR_RESET%
+echo %COLOR_GREEN%[8] Web Search%COLOR_RESET%
+echo %COLOR_RED%[9] Remove Windows Defender%COLOR_RESET%
 echo.
 echo %COLOR_LIGHT_RED%[0] Back to Main Menu%COLOR_RESET%
 echo.
@@ -191,7 +192,8 @@ if "%tweaks_choice%"=="4" goto search_indexing
 if "%tweaks_choice%"=="5" goto themes
 if "%tweaks_choice%"=="6" goto context_menu
 if "%tweaks_choice%"=="7" goto notifications
-if "%tweaks_choice%"=="8" goto windows_defender
+if "%tweaks_choice%"=="8" goto websearch
+if "%tweaks_choice%"=="9" goto windows_defender
 if "%tweaks_choice%"=="0" goto main_menu
 echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
 pause
@@ -235,6 +237,168 @@ echo Opening DefenderRemover.exe...
 start "" "%~dp0Scripts\DefenderRemover.exe"
 goto tweaks
 
+
+:websearch
+cls
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_CYAN%      WEBSEARCH%COLOR_RESET%
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo.
+echo %COLOR_GREEN%[1] Enable Web Search%COLOR_RESET%
+echo %COLOR_GREEN%[2] Disable Web Search%COLOR_LIGHT_RED% (Recommended)%COLOR_RESET% %COLOR_RESET%
+echo.
+echo %COLOR_LIGHT_RED%[0] Back to Tweaks%COLOR_RESET%
+echo.
+set /p web_choice="< "
+
+set web_choice=%web_choice: =%
+
+if "%web_choice%"=="1" goto add_websearch
+if "%web_choice%"=="2" goto remove_websearch
+if "%web_choice%"=="0" goto tweaks
+
+:: Invalid choice handling
+echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
+pause
+goto websearch
+
+
+
+::-----------------------------------
+:: REMOVE WEBSEARCH AND BING SEARCH
+::-----------------------------------
+:remove_websearch
+cls
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_CYAN%   REMOVING WEBSEARCH AND BINGSEARCH%COLOR_RESET%
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo.
+echo Removing WebSearch and BingSearch...
+
+powershell -Command "Start-Process cmd.exe -ArgumentList '/c reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"AllowSearchToUseLocation\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search\" /v \"BingSearchEnabled\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsAADCloudSearchEnabled\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsDeviceSearchHistoryEnabled\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsMSACloudSearchEnabled\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"SafeSearchMode\" /t REG_DWORD /d 0 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"ConnectedSearchUseWeb\" /t REG_DWORD /d 0 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"DisableWebSearch\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer\" /v \"DisableSearchBoxSuggestions\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search\" /v \"SearchboxTaskbarMode\" /t REG_DWORD /d 1 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"EnableDynamicContentInWSB\" /t REG_DWORD /d 0 /f && reg add \"HKCU\Software\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsDynamicSearchBoxEnabled\" /t REG_DWORD /d 0 /f' -Verb RunAs"
+
+powershell -Command "Start-Process powershell.exe -ArgumentList '-NoP -NonI -Command Get-AppxPackage -AllUsers Microsoft.BingSearch* ^| Remove-AppxPackage -AllUsers' -Verb RunAs"
+
+
+:: Wait for a moment before restarting Explorer (adding a delay to make sure it applies)
+timeout /t 2 /nobreak >nul
+
+:: Restart Explorer and SearchHost to apply changes
+taskkill /f /im explorer.exe >nul 2>&1
+taskkill /f /im SearchHost.exe >nul 2>&1
+start explorer.exe
+
+
+echo %COLOR_GREEN%WebSearch and BingSearch has been removed.%COLOR_RESET%
+pause
+goto tweaks
+
+
+
+::-----------------------------------
+:: ENABLE WEBSEARCH AND BING SEARCH 
+::-----------------------------------
+:add_websearch
+cls
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_CYAN%   ADD WEBSEARCH AND BINGSEARCH%COLOR_RESET%
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo.
+echo Adding WebSearch and BingSearch...
+
+powershell -Command "Start-Process cmd.exe -ArgumentList '/c reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"AllowSearchToUseLocation\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search\" /v \"BingSearchEnabled\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsAADCloudSearchEnabled\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsDeviceSearchHistoryEnabled\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsMSACloudSearchEnabled\" /t REG_DWORD /d 1 /f && reg add \"HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"SafeSearchMode\" /t REG_DWORD /d 1 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"ConnectedSearchUseWeb\" /t REG_DWORD /d 1 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"DisableWebSearch\" /t REG_DWORD /d 0 /f && reg add \"HKCU\SOFTWARE\Policies\Microsoft\Windows\Explorer\" /v \"DisableSearchBoxSuggestions\" /t REG_DWORD /d 0 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search\" /v \"EnableDynamicContentInWSB\" /t REG_DWORD /d 1 /f && reg add \"HKCU\Software\Microsoft\Windows\CurrentVersion\SearchSettings\" /v \"IsDynamicSearchBoxEnabled\" /t REG_DWORD /d 1 /f' -Verb RunAs"
+timeout /t 2 /nobreak >nul
+
+:: Restart Explorer and SearchHost to apply changes
+taskkill /f /im explorer.exe >nul 2>&1
+taskkill /f /im SearchHost.exe >nul 2>&1
+start explorer.exe
+
+echo %COLOR_GREEN%WebSearch and BingSearch has been added.%COLOR_RESET%
+pause
+goto tweaks
+
+
+
+::-------------------
+:: REMOVE UNNECESSARY APPS
+::-------------------
+:remove_unnecessary_apps
+cls
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_CYAN%   REMOVE UNNECESSARY APPS%COLOR_RESET%
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo.
+
+:: List of apps to remove
+setlocal enabledelayedexpansion
+set "APP1=Microsoft 365 Office|Get-AppxPackage -Name Microsoft.MicrosoftOfficeHub"
+set "APP2=Microsoft To Do|Get-AppxPackage -Name Microsoft.Todos"
+set "APP3=News|Get-AppxPackage -Name Microsoft.BingNews"
+set "APP4=Microsoft Teams|Get-AppxPackage *Teams*"
+set "APP5=Outlook|Get-AppxPackage *outlook*"
+set "APP6=Power Automate|Get-AppxPackage -Name Microsoft.PowerAutomateDesktop"
+set "APP7=Quick Assist|Get-AppxPackage -Name MicrosoftCorporationII.QuickAssist"
+set "APP8=Solitaire & Casual Games|Get-AppxPackage -Name Microsoft.MicrosoftSolitaireCollection"
+set "APP9=Sound Recorder|Get-AppxPackage -Name Microsoft.WindowsSoundRecorder"
+set "APP10=Sticky Notes|Get-AppxPackage -Name Microsoft.MicrosoftStickyNotes"
+set "APP11=Weather|Get-AppxPackage -Name Microsoft.BingWeather"
+set "APP12=Windows Clock|Get-AppxPackage -Name Microsoft.WindowsAlarms"
+set "APP13=Xbox Live|Get-AppxPackage -Name Microsoft.Xbox.TCUI"
+set "APP14=Feedback Hub|Get-AppxPackage -Name Microsoft.WindowsFeedbackHub"
+set "APP15=Camera|Get-AppxPackage -Name Microsoft.WindowsCamera"
+set "APP16=Microsoft ClipChamp|Get-AppxPackage *clipchamp*"
+set "APP17=Xbox|Get-AppxPackage -Name  Microsoft.XboxApp"
+set "APP18=Get Help|Get-AppxPackage -Name Microsoft.GetHelp"
+set "APP19=Phone Link|Get-AppxPackage -Name Microsoft.YourPhone"
+set "APP20=People|Get-AppxPackage -Name Microsoft.People"
+set "APP21=Office OneNote|Get-AppxPackage -Name Microsoft.Office.OneNote"
+set "APP22=Skype|Get-AppxPackage -Name Microsoft.SkypeApp"
+set "APP23=Mixed Reality Portal|Get-AppxPackage -Name Microsoft.MixedReality.Portal"
+set "APP24=Maps|Get-AppxPackage -Name Microsoft.WindowsMaps"
+set "APP25=Snip & Sketch|Get-AppxPackage -Name Microsoft.ScreenSketch"
+set "APP26=Cortana|Get-AppxPackage -Name Microsoft.549981C3F5F10"
+set "APP27=Mail|Get-AppxPackage -Name microsoft.windowscommunicationsapps"
+set "APP28=Photos|Get-AppxPackage *photos*"
+set "APP29=Bing Search|Get-AppxPackage *bingsearch*"
+set "APP30=Dev Home|Get-AppxPackage *devhome*"
+
+:: Display the list of apps
+echo Would you like to uninstall these apps?
+echo.
+for /L %%i in (1,1,30) do (
+    for /F "tokens=1,* delims=|" %%A in ("!APP%%i!") do (
+        echo %COLOR_LIGHT_CYAN%- %%A%COLOR_RESET%
+    )
+)
+echo.
+
+set /p choice=Enter your choice (Y/N): 
+if /i "%choice%"=="y" (
+    :: Uninstall all apps
+    for /L %%i in (1,1,30) do (
+        for /F "tokens=1,* delims=|" %%A in ("!APP%%i!") do (
+            powershell -Command "if ((%%B)) { %%B | Remove-AppxPackage }"
+            timeout /t 1 > nul
+            if %ERRORLEVEL% EQU 0 (
+                echo [%COLOR_YELLOW%SUCCESS%COLOR_RESET%] %%A uninstalled successfully!
+            ) else (
+                echo [%COLOR_RED%ERROR%COLOR_RESET%] %%A could not be uninstalled or was not installed.
+            )
+        )
+    )
+    echo %COLOR_GREEN%Uninstallation process completed successfully!%COLOR_RESET%
+) else (
+    echo %COLOR_RED%Uninstallation canceled.%COLOR_RESET%
+)
+
+
+
+pause
+goto tweaks
+
+
+
 ::-------------------
 :: NOTIFICATIONS
 ::-------------------
@@ -249,16 +413,18 @@ echo %COLOR_GREEN%[2] Remove Notifications %COLOR_LIGHT_RED%(Not Recommended)%CO
 echo.
 echo %COLOR_LIGHT_RED%[0] Back to Tweaks%COLOR_RESET%
 echo.
-set /p themes_choice="< "
+set /p notifications_choice="< "
 
-if "%themes_choice%"=="1" goto add_notifications
-if "%themes_choice%"=="2" goto remove_notifications
-if "%themes_choice%"=="0" goto tweaks
+set notification_choice=%notification_choice: =%
+
+if "%notifications_choice%"=="1" goto add_notifications
+if "%notifications_choice%"=="2" goto remove_notifications
+if "%notifications_choice%"=="0" goto tweaks
 
 :: Invalid choice handling
 echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
 pause
-goto themes
+goto notifications
 
 
 ::----------------------
@@ -318,78 +484,6 @@ goto tweaks
 
 
 
-::-------------------
-:: REMOVE UNNECESSARY APPS
-::-------------------
-:remove_unnecessary_apps
-cls
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
-echo %COLOR_CYAN%   REMOVE UNNECESSARY APPS%COLOR_RESET%
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
-echo.
-
-:: List of apps to remove
-setlocal enabledelayedexpansion
-set "APP1=Microsoft 365 Office|Get-AppxPackage -Name Microsoft.MicrosoftOfficeHub"
-set "APP2=Microsoft To Do|Get-AppxPackage -Name Microsoft.Todos"
-set "APP3=News|Get-AppxPackage -Name Microsoft.BingNews"
-set "APP4=Microsoft Teams|Get-AppxPackage -Name MSTeams"
-set "APP5=Outlook|Get-AppxPackage -Name Microsoft.OutlookForWindows"
-set "APP6=Power Automate|Get-AppxPackage -Name Microsoft.PowerAutomateDesktop"
-set "APP7=Quick Assist|Get-AppxPackage -Name MicrosoftCorporationII.QuickAssist"
-set "APP8=Solitaire & Casual Games|Get-AppxPackage -Name Microsoft.MicrosoftSolitaireCollection"
-set "APP9=Sound Recorder|Get-AppxPackage -Name Microsoft.WindowsSoundRecorder"
-set "APP10=Sticky Notes|Get-AppxPackage -Name Microsoft.MicrosoftStickyNotes"
-set "APP11=Weather|Get-AppxPackage -Name Microsoft.BingWeather"
-set "APP12=Windows Clock|Get-AppxPackage -Name Microsoft.WindowsAlarms"
-set "APP13=Xbox Gamebar|Get-AppxPackage -Name Microsoft.XboxGamingOverlay"
-set "APP14=Xbox Live|Get-AppxPackage -Name Microsoft.Xbox.TCUI"
-set "APP15=Feedback Hub|Get-AppxPackage -Name Microsoft.WindowsFeedbackHub"
-set "APP16=Camera|Get-AppxPackage -Name Microsoft.WindowsCamera"
-set "APP17=Microsoft ClipChamp|Get-AppxPackage -Name Clipchamp"
-set "APP18=Xbox|Get-AppxPackage -Name  Microsoft.XboxApp"
-set "APP19=Get Help|Get-AppxPackage -Name Microsoft.GetHelp"
-set "APP20=Phone Link|Get-AppxPackage -Name Microsoft.YourPhone"
-set "APP21=People|Get-AppxPackage -Name Microsoft.People"
-set "APP22=Office OneNote|Get-AppxPackage -Name Microsoft.Office.OneNote"
-set "APP23=Skype|Get-AppxPackage -Name Microsoft.SkypeApp"
-set "APP24=Mixed Reality Portal|Get-AppxPackage -Name Microsoft.MixedReality.Portal"
-set "APP25=Maps|Get-AppxPackage -Name Microsoft.WindowsMaps"
-set "APP26=Snip & Sketch|Get-AppxPackage -Name Microsoft.ScreenSketch"
-set "APP27=Cortana|Get-AppxPackage -Name Microsoft.549981C3F5F10"
-set "APP28=Mail|Get-AppxPackage -Name microsoft.windowscommunicationsapps"
-
-:: Display the list of apps
-echo Would you like to uninstall these apps?
-echo.
-for /L %%i in (1,1,28) do (
-    for /F "tokens=1,* delims=|" %%A in ("!APP%%i!") do (
-        echo %COLOR_LIGHT_CYAN%- %%A%COLOR_RESET%
-    )
-)
-echo.
-
-set /p choice=Enter your choice (Y/N): 
-if /i "%choice%"=="y" (
-    :: Uninstall all apps
-    for /L %%i in (1,1,28) do (
-        for /F "tokens=1,* delims=|" %%A in ("!APP%%i!") do (
-            powershell -Command "if ((%%B)) { %%B | Remove-AppxPackage }"
-            if %ERRORLEVEL% EQU 0 (
-                echo [%COLOR_YELLOW%SUCCESS%COLOR_RESET%] %%A uninstalled successfully!
-            ) else (
-                echo [%COLOR_RED%ERROR%COLOR_RESET%] %%A could not be uninstalled or was not installed.
-            )
-        )
-    )
-    echo %COLOR_GREEN%Uninstallation process completed successfully!%COLOR_RESET%
-) else (
-    echo %COLOR_RED%Uninstallation canceled.%COLOR_RESET%
-)
-
-pause
-goto tweaks
-
 
 
 ::-------------------
@@ -406,16 +500,18 @@ echo %COLOR_GREEN%[2] Remove Container Context Menu %COLOR_LIGHT_RED%(Recommende
 echo.
 echo %COLOR_LIGHT_RED%[0] Back to Tweaks%COLOR_RESET%
 echo.
-set /p themes_choice="< "
+set /p context_choice="< "
 
-if "%themes_choice%"=="1" goto add_context_menu
-if "%themes_choice%"=="2" goto remove_context_menu
-if "%themes_choice%"=="0" goto tweaks
+set context_choice=%context_choice: =%
+
+if "%context_choice%"=="1" goto add_context_menu
+if "%context_choice%"=="2" goto remove_context_menu
+if "%context_choice%"=="0" goto tweaks
 
 :: Invalid choice handling
 echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
 pause
-goto themes
+goto context_menu
 
 
 ::-------------------
@@ -504,9 +600,10 @@ echo %COLOR_CYAN%   LIGHTWEIGHT THEME%COLOR_RESET%
 echo %COLOR_MAGENTA%************************************%COLOR_RESET%
 echo.
 echo %COLOR_GREEN%- Reduced animations for smoother performance.%COLOR_RESET%
-echo %COLOR_RED%- [!] Removed Widgets.%COLOR_RESET%
-echo %COLOR_GREEN%- Turned off Task View.%COLOR_RESET%
-echo %COLOR_GREEN%- Removes Learn about this picture.%COLOR_RESET%
+echo %COLOR_GREEN%- Disables Widgets.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns OFF Task View.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns OFF Learn about this picture.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns ON File Extensions.%COLOR_RESET%
 echo %COLOR_GREEN%- Taskbar is on the left.%COLOR_RESET%
 echo %COLOR_GREEN%- Changed search icon to default.%COLOR_RESET%
 echo.
@@ -522,6 +619,7 @@ goto ask_lightweight
 echo Applying Lightweight theme settings...
 
 :: Disable Animations
+echo %COLOR_LIGHT_CYAN%= Applying animations.%COLOR_RESET%
 reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /t REG_SZ /d "2" /f >nul 2>&1
 reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /t REG_BINARY /d "9012038010000000" /f >nul 2>&1
 reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /t REG_SZ /d "1" /f >nul 2>&1
@@ -535,30 +633,46 @@ reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /t REG_DWORD /d "0" /f >nul 2>&1
 
 :: Disable Task View (set "ShowTaskViewButton" to 0)
+echo %COLOR_LIGHT_CYAN%= Turning off Task View.%COLOR_RESET%
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d "0" /f >nul 2>&1
 
 
 :: Disable "Learn about this picture icon"
+echo %COLOR_LIGHT_CYAN%= Turning off Learn about this picture..%COLOR_RESET%
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{2cc5ca98-6485-489a-920e-b3e88a6ccce3}" /t REG_DWORD /d 1 /f >nul 2>&1
+
+:: Enable File Extensions
+echo %COLOR_LIGHT_CYAN%= Enabling Show File Extensions%COLOR_RESET%
+powershell -Command "Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'HideFileExt' -value 0"
 
 :: Hide Search Icon (set "ShowSearchBox" to 0)
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowSearchBox" /t REG_DWORD /d "0" /f >nul 2>&1
 
 :: Change Taskbar Alignment to Left using PowerShell
+echo %COLOR_LIGHT_CYAN%= Changing the Taskbar Alignment to left..%COLOR_RESET%
 powershell -Command "Set-ItemProperty -Path 'HKCU:\software\microsoft\windows\currentversion\explorer\advanced' -Name 'TaskbarAl' -Type 'DWord' -Value 0"
 
+
 :: Change Search Icon to Search (icon only) using PowerShell
+echo %COLOR_LIGHT_CYAN%= Changing the Search Icon to icon-only..%COLOR_RESET%
 powershell -Command "Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 1"
 
-:: Remove Widgets using PowerShell
-echo Removing Widgets...
-powershell -Command "Get-AppxPackage -AllUsers | Where-Object {$_.Name -like '*WebExperience*'} | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue" >nul 2>&1
-powershell -Command "$AppxRemoval = Get-AppxProvisionedPackage -Online | Where-Object {$_.PackageName -like '*WebExperience*'}; ForEach ($App in $AppxRemoval) {Remove-AppxProvisionedPackage -Online -PackageName $App.PackageName}" >nul 2>&1
+:: Remove Widgets (News and interests) using PowerShell
+echo %COLOR_LIGHT_CYAN%= Disabling Widgets...%COLOR_RESET%
+powershell -Command "Start-Process cmd.exe -ArgumentList '/c reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds\" /v EnableFeeds /t REG_DWORD /d 0 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Dsh\" /v AllowNewsAndInterests /t REG_DWORD /d 0 /f' -Verb RunAs"
+
+
+:: Wait for a moment before restarting Explorer (adding a delay to make sure it applies)
+timeout /t 2 /nobreak >nul
+
+:: Restart Explorer and SearchHost to apply changes
+taskkill /f /im explorer.exe >nul 2>&1
+start explorer.exe
 
 :: Show success message and notification to restart
 echo %COLOR_GREEN%Lightweight theme applied successfully!%COLOR_RESET%
 echo.
-echo %COLOR_YELLOW%To fully remove Widgets from your system and apply animations, you will need to restart your computer or just sign out.%COLOR_RESET%
+echo %COLOR_YELLOW%To fully apply animations, you will need to restart your computer or just sign out.%COLOR_RESET%
 :: Ask the user if they want to sign out (shutdown.exe /l)
 set /p USER_INPUT="Do you want to sign out now for the changes to take effect? (Y/N): "
 if /i "%USER_INPUT%"=="Y" goto sign_out
@@ -578,9 +692,11 @@ echo %COLOR_CYAN%   HEAVYWEIGHT THEME%COLOR_RESET%
 echo %COLOR_MAGENTA%************************************%COLOR_RESET%
 echo.
 echo %COLOR_GREEN%- Enabled all animations for best appearance.%COLOR_RESET%
-echo %COLOR_GREEN%- Turned on Task View.%COLOR_RESET%
+echo %COLOR_GREEN%- Enables Widgets.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns ON Task View.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns OFF Learn about this picture.%COLOR_RESET%
+echo %COLOR_GREEN%- Turns ON File Extensions.%COLOR_RESET%
 echo %COLOR_GREEN%- Taskbar is centered.%COLOR_RESET%
-echo %COLOR_GREEN%- Removes Learn about this picture.%COLOR_RESET%
 echo %COLOR_GREEN%- Changed search icon to search box.%COLOR_RESET%
 echo.
 :ask_heavyweight
@@ -595,20 +711,37 @@ goto ask_heavyweight
 echo Applying Heavyweight theme settings...
 
 :: Set VisualFXSetting to 1 (Best for Appearance) for animations
+echo %COLOR_LIGHT_CYAN%= Applying animations.%COLOR_RESET%
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "1" /f >nul 2>&1
 :: Enable Task View (set "ShowTaskViewButton" to 1)
+echo %COLOR_LIGHT_CYAN%= Turning on Task View.%COLOR_RESET%
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d "1" /f >nul 2>&1
 
 :: Disable "Learn about this picture icon"
+echo %COLOR_LIGHT_CYAN%= Turning off Learn about this picture..%COLOR_RESET%
 reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" /v "{2cc5ca98-6485-489a-920e-b3e88a6ccce3}" /t REG_DWORD /d 1 /f >nul 2>&1
+
+:: Enable File Extensions
+echo %COLOR_LIGHT_CYAN%= Enabling Show File Extensions%COLOR_RESET%
+powershell -Command "Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' -Name 'HideFileExt' -value 0"
 
 :: Revert Search Box (set "SearchboxTaskbarMode" to 2 for Search Box)
 powershell -Command "Set-ItemProperty -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search' -Name 'SearchboxTaskbarMode' -Type 'DWord' -Value 2"
 
 :: Change Taskbar Alignment to Center (set "TaskbarAl" to 1)
+echo %COLOR_LIGHT_CYAN%= Changing the Taskbar Alignment to center..%COLOR_RESET%
 powershell -Command "Set-ItemProperty -Path 'HKCU:\software\microsoft\windows\currentversion\explorer\advanced' -Name 'TaskbarAl' -Type 'DWord' -Value 1"
 
-:: Do NOT remove Widgets (skip widgets removal)
+:: Enables Widgets
+echo %COLOR_LIGHT_CYAN%= Adding Widgets...%COLOR_RESET%
+powershell -Command "Start-Process cmd.exe -ArgumentList '/c reg add \"HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds\" /v EnableFeeds /t REG_DWORD /d 1 /f && reg add \"HKLM\SOFTWARE\Policies\Microsoft\Dsh\" /v AllowNewsAndInterests /t REG_DWORD /d 1 /f' -Verb RunAs"
+
+:: Wait for a moment before restarting Explorer (adding a delay to make sure it applies)
+timeout /t 2 /nobreak >nul
+
+:: Restart Explorer and SearchHost to apply changes
+taskkill /f /im explorer.exe >nul 2>&1
+start explorer.exe
 
 :: Show success message
 echo %COLOR_GREEN%Heavyweight theme applied successfully!%COLOR_RESET%
@@ -621,11 +754,6 @@ if /i "%USER_INPUT%"=="N" goto themes
 
 :: If user input is anything else, return to the main themes menu
 goto themes
-
-
-
-
-
 
 
 
@@ -647,12 +775,14 @@ echo %COLOR_LIGHT_RED%[0] Back to Tweaks%COLOR_RESET%
 echo.
 set /p search_choice="< "
 
+set search_choice=%search_choice: =%
+
 if "%search_choice%"=="1" goto enable_search_indexing
 if "%search_choice%"=="2" goto disable_search_indexing
 if "%search_choice%"=="0" goto tweaks
 echo %COLOR_RED%Invalid choice. Please try again.%COLOR_RESET%
 pause
-goto tweaks
+goto search_indexing
 
 
 ::-------------------
@@ -720,9 +850,25 @@ echo %COLOR_GREEN%Search indexing has been enabled.%COLOR_RESET%
 pause
 goto tweaks
 
+::-------------------
+:: REMOVE MICROSOFT EDGE
+::-------------------
+:remove_edge
+cls
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo %COLOR_CYAN%      REMOVE MICROSOFT EDGE%COLOR_RESET%
+echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+echo.
+echo %COLOR_YELLOW%Running PowerShell script to remove Microsoft Edge...%COLOR_RESET%
 
+:: Run the PowerShell script from Scripts folder with admin privileges
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "Start-Process PowerShell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"%CD%\Scripts\RemoveEdge.ps1\"' -Verb RunAs"
 
-
+:: Wait for the process to complete
+echo %COLOR_GREEN%EdgeRemover script has been executed.%COLOR_RESET%
+pause
+goto tweaks
 
 
 
@@ -755,29 +901,32 @@ if /i "%mas_confirm%"=="y" (
 pause
 goto tweaks
 
-
-
 ::-------------------
-:: REMOVE MICROSOFT EDGE
+:: WINUTIL
 ::-------------------
-:remove_edge
+:winutil
 cls
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
-echo %COLOR_CYAN%      REMOVE MICROSOFT EDGE%COLOR_RESET%
-echo %COLOR_MAGENTA%************************************%COLOR_RESET%
+type ASCII\ascii.txt
 echo.
-echo %COLOR_YELLOW%Running PowerShell script to remove Microsoft Edge...%COLOR_RESET%
-
-:: Run the PowerShell script from Scripts folder with admin privileges
-powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-    "Start-Process PowerShell -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File \"%CD%\Scripts\RemoveEdge.ps1\"' -Verb RunAs"
-
-:: Wait for the process to complete
-echo %COLOR_GREEN%EdgeRemover script has been executed.%COLOR_RESET%
+echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
+echo %COLOR_CYAN%WinUtil: Enhance Your Windows Experience%COLOR_RESET%
+echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
+echo.
+echo %COLOR_GREEN%Github: https://github.com/ChrisTitusTech/winutil%COLOR_RESET%
+echo.
+echo WinUtil installs performance tweaks and useful tools.
+echo Would you like to install WinUtil? %COLOR_YELLOW%Y/N%COLOR_RESET%
+set /p winutil_confirm="< "
+if /i "%winutil_confirm%"=="y" (
+    echo Installing WinUtil...
+    powershell -Command "Start-Process powershell -ArgumentList 'irm \"https://christitus.com/win\" | iex' -Verb runAs"
+    
+    echo %COLOR_GREEN%WinUtil has been installed.%COLOR_RESET%
+) else (
+    echo %COLOR_RED%Installation canceled.%COLOR_RESET%
+)
 pause
-goto tweaks
-
-
+goto main_menu
 
 
 ::-------------------
@@ -806,32 +955,7 @@ pause
 goto system_utilities
 
 
-::-------------------
-:: WINUTIL
-::-------------------
-:winutil
-cls
-type ASCII\ascii.txt
-echo.
-echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
-echo %COLOR_CYAN%WinUtil: Enhance Your Windows Experience%COLOR_RESET%
-echo %COLOR_MAGENTA%********************************************%COLOR_RESET%
-echo.
-echo %COLOR_GREEN%Github: https://github.com/ChrisTitusTech/winutil%COLOR_RESET%
-echo.
-echo WinUtil installs performance tweaks and useful tools.
-echo Would you like to install WinUtil? %COLOR_YELLOW%Y/N%COLOR_RESET%
-set /p winutil_confirm="< "
-if /i "%winutil_confirm%"=="y" (
-    echo Installing WinUtil...
-    powershell -Command "Start-Process powershell -ArgumentList 'irm \"https://christitus.com/win\" | iex' -Verb runAs"
-    
-    echo %COLOR_GREEN%WinUtil has been installed.%COLOR_RESET%
-) else (
-    echo %COLOR_RED%Installation canceled.%COLOR_RESET%
-)
-pause
-goto main_menu
+
 
 
 
@@ -913,6 +1037,9 @@ exit
 :install_packages
 cls
 type ASCII\ascii.txt
+echo.
+echo.
+echo %COLOR_LIGHT_YELLOW%[#] Want to add more apps? Visit:%COLOR_RESET% %COLOR_BLUE%https://scoop.sh/#/apps%COLOR_RESET%
 echo.
 echo Checking packages to install from 'Configuration\scoop-packages\packages-list.txt'
 
@@ -1263,9 +1390,6 @@ goto system_utilities
 
 
 
-
-
-
 ::============================================================================
 ::                                 MISC
 ::============================================================================
@@ -1304,6 +1428,9 @@ cls
 exit
 
 
+::-------------------
+:: SIGN OUT
+::-------------------
 :sign_out
 echo Signing out...
 shutdown.exe /l
