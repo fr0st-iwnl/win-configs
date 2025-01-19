@@ -62,6 +62,9 @@ if "%LOCAL_VERSION%"=="%LATEST_VERSION%" (
     echo %COLOR_YELLOW%Your current version is: %LOCAL_VERSION%%COLOR_RESET%.
     echo %COLOR_DARK_RED%Please update the script to the latest version.%COLOR_RESET%
     echo.
+    echo %COLOR_CYAN%For details about the latest release, visit:%COLOR_RESET%
+    echo %COLOR_BLUE%- https://github.com/fr0st-iwnl/WinConfigs/releases%COLOR_RESET%
+    echo.
     :ask_update
     echo Do you want to download and update to the latest version from GitHub? %COLOR_YELLOW%Y/N%COLOR_RESET%
     set /p install_update="< "
